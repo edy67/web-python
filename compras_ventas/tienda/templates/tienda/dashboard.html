@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Compras y Ventas</title>
+  <style>
+    :root { --bg:#0f172a; --card:#1e293b; --line:#334155; --txt:#e2e8f0;
+            --muted:#94a3b8; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444; --acc:#38bdf8; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+           background:var(--bg); color:var(--txt); }
+    header { display:flex; justify-content:space-between; align-items:center;
+             padding:16px 24px; border-bottom:1px solid var(--line); flex-wrap:wrap; gap:12px; }
+    h1 { font-size:1.25rem; margin:0; }
+    a.btn { background:var(--acc); color:#0f172a; text-decoration:none; font-weight:600;
+            padding:8px 14px; border-radius:8px; font-size:.9rem; }
+    main { padding:24px; max-width:1100px; margin:0 auto; }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px; margin-bottom:28px; }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px; }
+    .card .label { color:var(--muted); font-size:.8rem; text-transform:uppercase; letter-spacing:.04em; }
+    .card .value { font-size:1.6rem; font-weight:700; margin-top:6px; }
+    .value.ok { color:var(--ok); } .value.bad { color:var(--bad); }
+    section { margin-bottom:32px; }
+    h2 { font-size:1rem; color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:8px; }
+    table { width:100%; border-collapse:collapse; font-size:.9rem; }
+    th,td { text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); }
+    th { color:var(--muted); font-weight:600; }
+    .pill { display:inline-block; padding:2px 10px; border-radius:999px; font-size:.8rem; font-weight:600; }
+    .pill.ok { background:rgba(34,197,94,.15); color:var(--ok); }
+    .pill.warn { background:rgba(245,158,11,.15); color:var(--warn); }
+    .pill.bad { background:rgba(239,68,68,.15); color:var(--bad); }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    @media (max-width:760px){ .grid2 { grid-template-columns:1fr; } }
+    .empty { color:var(--muted); font-style:italic; padding:12px 0; }
+    .num { text-align:right; font-variant-numeric:tabular-nums; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🛒 Compras y Ventas</h1>
+    <a class="btn" href="/admin/">Gestionar en el panel →</a>
+  </header>
+
+  <main>
+    <div class="cards">
+      <div class="card"><div class="label">Productos</div><div class="value">{{ num_productos }}</div></div>
+      <div class="card"><div class="label">Total compras</div><div class="value">${{ total_compras }}</div></div>
+      <div class="card"><div class="label">Total ventas</div><div class="value">${{ total_ventas }}</div></div>
+      <div class="card"><div class="label">Ganancia</div>
+        <div class="value {% if ganancia >= 0 %}ok{% else %}bad{% endif %}">${{ ganancia }}</div></div>
+    </div>
+
+    <section>
+      <h2>Inventario</h2>
+      <table>
+        <thead><tr><th>Producto</th><th class="num">Precio venta</th>
+          <th class="num">Comprado</th><th class="num">Vendido</th><th class="num">Stock</th></tr></thead>
+        <tbody>
+          {% for p in productos %}
+          <tr>
+            <td>{{ p.nombre }}</td>
+            <td class="num">${{ p.precio_venta }}</td>
+            <td class="num">{{ p.total_comprado }}</td>
+            <td class="num">{{ p.total_vendido }}</td>
+            <td class="num">
+              <span class="pill {% if p.stock <= 0 %}bad{% elif p.stock <= 5 %}warn{% else %}ok{% endif %}">{{ p.stock }}</span>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="empty">Aún no hay productos. Agrégalos desde el panel.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <div class="grid2">
+      <section>
+        <h2>Últimas compras</h2>
+        <table>
+          <thead><tr><th>Producto</th><th class="num">Cant.</th><th class="num">Total</th></tr></thead>
+          <tbody>
+            {% for c in ultimas_compras %}
+            <tr><td>{{ c.producto.nombre }}</td><td class="num">{{ c.cantidad }}</td><td class="num">${{ c.total }}</td></tr>
+            {% empty %}<tr><td colspan="3" class="empty">Sin compras registradas.</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Últimas ventas</h2>
+        <table>
+          <thead><tr><th>Producto</th><th class="num">Cant.</th><th class="num">Total</th></tr></thead>
+          <tbody>
+            {% for v in ultimas_ventas %}
+            <tr><td>{{ v.producto.nombre }}</td><td class="num">{{ v.cantidad }}</td><td class="num">${{ v.total }}</td></tr>
+            {% empty %}<tr><td colspan="3" class="empty">Sin ventas registradas.</td></tr>{% endfor %}
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

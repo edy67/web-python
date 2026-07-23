@@ -1,0 +1,5 @@
+Django>=5.1,<5.2
+gunicorn>=22.0
+whitenoise>=6.7
+# Descomenta si usas Azure Database for PostgreSQL (DATABASE_URL):
+# psycopg[binary]>=3.2
